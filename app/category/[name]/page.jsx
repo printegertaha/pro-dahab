@@ -15,6 +15,7 @@ export default async function CategoryProducts({ params, searchParams }) {
   } = await getCategoryProducts(pageNumber, categoryName);
 
   if (error || !category) {
+    console.log(error)
     return (
       <div className="flex items-center justify-center h-dvh ">
         <span className="text-red-800 text-4xl">حصل حاجة غلط </span>

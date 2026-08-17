@@ -12,10 +12,11 @@ const getCategories_with_someProducts = unstable_cache(
           products: {
             take: 4,
           },
-        }, 
+        },
       });
       return { data: categoriesWithProducts, error: null };
     } catch (err) {
+      console.log(err);
       return { data: [], error: "حصل خطأ في تحضير التصنيفات بالمنتجات" };
     }
   },

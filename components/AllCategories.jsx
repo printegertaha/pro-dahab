@@ -7,6 +7,7 @@ export default  function AllCategories({categoriesData}) {
    const {data: categories, error} = categoriesData;
 
   if (error) {
+    console.log(error)
     return <div>حصل مشكله في النت عند حضرتك</div>;
   }
 

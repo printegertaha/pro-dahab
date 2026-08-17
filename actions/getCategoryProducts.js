@@ -23,6 +23,7 @@ const getCategoryProducts = unstable_cache(
       ]);
       return { data, productsCount, error: null };
     } catch (err) {
+      console.log(err)
       return { data: [], error: "حصل خطأ" };
     }
   },
