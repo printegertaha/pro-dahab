@@ -1,13 +1,12 @@
-import getCategories from "@/actions/getCategories";
 import CategoryRow from "@/components/CategoryRow";
 import SkeletonProductCard from "@/skeltons/SkeltonProductCard";
 import { Suspense } from "react";
 
-export default async function AllCategories() {
-  const { categories, error: categoriesError } = await getCategories();
-  console.log(categories);
+export default  function AllCategories({categoriesData}) {
+  
+   const {data: categories, error} = categoriesData;
 
-  if (categoriesError) {
+  if (error) {
     return <div>حصل مشكله في النت عند حضرتك</div>;
   }
 
@@ -16,9 +15,8 @@ export default async function AllCategories() {
   }
 
   return (
-    <div className="border p-5 rounded-2xl w-full">
+    <div className=" p-5 rounded-2xl w-full">
       {categories.map((c) => (
-        // بنغلف كل صف بـ Suspense لوحده عشان الـ Streaming يشتغل باحترافية
         <Suspense
           key={c.id}
           fallback={

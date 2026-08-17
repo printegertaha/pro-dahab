@@ -38,6 +38,7 @@ model Product {
   ProductImage   ProductImage[]
   Review         Review[]
 
+  @@index([categoryId])
   @@index([title])
   @@index([price])
   @@index([createdAt(sort: Desc)])
@@ -57,6 +58,8 @@ model ProductDetails {
   productId   String  @unique
   description String
   Product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  
 }
 
 model ProductImage {
