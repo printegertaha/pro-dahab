@@ -19,7 +19,7 @@ export default function CategoryRow({ category }) {
         </Link>
       </div> 
 
-      {/* المنتجات (سكرول أفي) */}
+      {/* المنتجات (سكرول أفقي) */}
       <div className="flex items-center gap-5 overflow-x-auto  pb-4 scrollbar-none snap-x snap-mandatory">
         {category?.products?.length > 0 ? (
           category.products.map((p) => (

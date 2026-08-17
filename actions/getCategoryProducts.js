@@ -19,12 +19,11 @@ const getCategoryProducts = unstable_cache(
         }),
         prisma.product.count({
           where: { category: { name: categoryName } },
-        }),
+        }), // دي إنت مش فاهمها مسروقه
       ]);
       return { data, productsCount, error: null };
     } catch (err) {
-      console.log(err)
-      return { data: [], error: "حصل خطأ" };
+      return { data: [], error: "حصل خطأ", productsCount: 0 };
     }
   },
   ["products", `${"categoryName"}-products`],
