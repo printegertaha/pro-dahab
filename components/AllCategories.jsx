@@ -11,6 +11,7 @@ export default  function AllCategories({categoriesData}) {
   if (error) {
     console.log(error)
     return <div>حدث خطأ</div>;
+    
   }
 
   if (!categories || categories.length < 1) {

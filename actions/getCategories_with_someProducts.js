@@ -11,11 +11,14 @@ const getCategories_with_someProducts = unstable_cache(
           nickName: true,
           products: {
             take: 4,
-            orderBy: {createdAt: 'desc'}
+            orderBy: { createdAt: "desc" },
           },
         },
       });
-      return { data: categoriesWith_someProducts, error: null };
+      const serializedData = JSON.parse(
+        JSON.stringify(categoriesWith_someProducts),
+      );
+      return { data: serializedData, error: null };
     } catch (err) {
       return { data: [], error: err };
     }
