@@ -1,17 +1,14 @@
-
 import SkeletonProductCard from "@/skeltons/SkeltonProductCard";
 import { Suspense } from "react";
 import CategoryRow from "./CategoryRow";
 
-export default  function AllCategories({categoriesData}) {
-  
-   const {data: categories, error} = categoriesData;
-
+export default function AllCategories({ categoriesData }) {
+  const { data: categories, error } = categoriesData;
 
   if (error) {
-    console.log(error)
-    return <div>حدث خطأ</div>;
-    
+    console.log(error);
+
+    return <div>err: {JSON.stringify(err)}</div>; // رجّع نص الـ Error عشان تشوفه
   }
 
   if (!categories || categories.length < 1) {
