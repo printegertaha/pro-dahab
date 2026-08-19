@@ -1,84 +1,21 @@
-import getCategoryProducts from "@/actions_shop/getCategoryProducts";
-import PaginationBar from "@/components_shop/PaginationBar";
-import ProductCard from "@/components_shop/ProductCard";
-import { productsPerPage } from "@/lib/constants";
-import Link from "next/link";
+import CategoryProductsContent from "@/components_shop/CategoryProductsContent";
+import SkeletonProductCard from "@/skeltons/SkeltonProductCard";
 import { Suspense } from "react";
 
-export default async function CategoryProducts({ params, searchParams }) {
-  const { name: categoryName } = await params;
-  const parematers = await searchParams;
-  const pageNumber = Number(parematers.page) || 1;
-  const {
-    data: category,
-    error,
-    productsCount,
-  } = await getCategoryProducts(pageNumber, categoryName);
-
-  if (error || !category) {
-    console.log(error);
-    return (
-      <div className="flex items-center justify-center h-dvh ">
-        <span className="text-red-800 text-4xl">حصل خطأ </span>
-        <Link href="/" className="text-blue-600 cursor-pointer">
-          الصفحة الرئيسية
-        </Link>
-      </div>
-    );
-  }
-
-  const products = category.products;
-
-  if (products.length < 1) {
-    const { data: category, productsCount } = await getCategoryProducts(
-      1,
-      categoryName,
-    );
-    const products = category.products;
-    if (products.length > 0) {
-      return (
-        <div>
-          <h3>{category?.nickName}</h3>
-          <div className="flex gap-5 flex-wrap justify-center">
-            {products?.map((p) => (
-              <ProductCard
-                key={p.id}
-                title={p.title}
-                price={p.price ? Number(p.price) : 0}
-                thumbnail={p.thumbnail}
-              />
+export default function CategoryProducts({ params, searchParams }) {
+  return (
+    <>
+      <Suspense
+        fallback={
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 10 }).map((_, idx) => (
+              <SkeletonProductCard key={idx} />
             ))}
           </div>
-          <PaginationBar
-            totalPages={Math.ceil(productsCount / productsPerPage)}
-            currentPage={pageNumber}
-          />
-        </div>
-      );
-    } else {
-      return <div> مفيش منتجات تتعرض</div>;
-    }
-  }
-
-  return (
-    <div>
-      <h3 className=" px-[5%] py-2 text-3xl">{category?.nickName}</h3>
-      <Suspense fallback={<div>loading products</div>}>
-        <div className="flex gap-5 flex-wrap justify-center">
-          {products?.map((p) => (
-            <ProductCard
-              key={p.id}
-              title={p.title}
-              price={p.price ? Number(p.price) : 0}
-              thumbnail={p.thumbnail}
-            />
-          ))}
-        </div>
+        }
+      >
+        <CategoryProductsContent params={params} searchParams={searchParams} />
       </Suspense>
-      <PaginationBar
-        totalPages={Math.ceil(productsCount / productsPerPage)}
-        currentPage={pageNumber}
-      />
-    </div>
+    </>
   );
 }
