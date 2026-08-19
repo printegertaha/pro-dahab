@@ -1,8 +1,9 @@
-import getCategoryProducts from "@/actions/getCategoryProducts";
-import PaginationBar from "@/components/PaginationBar";
-import ProductCard from "@/components/ProductCard";
+import getCategoryProducts from "@/actions_shop/getCategoryProducts";
+import PaginationBar from "@/components_shop/PaginationBar";
+import ProductCard from "@/components_shop/ProductCard";
 import { productsPerPage } from "@/lib/constants";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default async function CategoryProducts({ params, searchParams }) {
   const { name: categoryName } = await params;
@@ -60,18 +61,20 @@ export default async function CategoryProducts({ params, searchParams }) {
   }
 
   return (
-    <div >
+    <div>
       <h3 className=" px-[5%] py-2 text-3xl">{category?.nickName}</h3>
-      <div className="flex gap-5 flex-wrap justify-center">
-        {products?.map((p) => (
-          <ProductCard
-            key={p.id}
-            title={p.title}
-            price={p.price ? Number(p.price) : 0}
-            thumbnail={p.thumbnail}
-          />
-        ))}
-      </div>
+      <Suspense fallback={<div>loading products</div>}>
+        <div className="flex gap-5 flex-wrap justify-center">
+          {products?.map((p) => (
+            <ProductCard
+              key={p.id}
+              title={p.title}
+              price={p.price ? Number(p.price) : 0}
+              thumbnail={p.thumbnail}
+            />
+          ))}
+        </div>
+      </Suspense>
       <PaginationBar
         totalPages={Math.ceil(productsCount / productsPerPage)}
         currentPage={pageNumber}

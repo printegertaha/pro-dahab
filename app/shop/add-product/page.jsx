@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function TestPage() {
+export default function addProductPage() {
   return (
     <div>
-      test page
+      add
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components_shop/ProductCard";
 import Link from "next/link";
 
 export default function CategoryRow({ category }) {
@@ -9,21 +9,35 @@ export default function CategoryRow({ category }) {
         <h2 className="text-xl md:text-2xl font-bold text-zinc-100 tracking-wide">
           {category.nickName}
         </h2>
-        
-        <Link 
-          href={`/category/${category.name}`}
+
+        <Link
+          href={`/shop/categories/${category.name}`}
           className="text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1 group"
         >
           <span>مشاهدة الكل</span>
-          <span className="transition-transform group-hover:-translate-x-1">←</span>
+          <span className="transition-transform group-hover:-translate-x-1">
+            ←
+          </span>
         </Link>
-      </div> 
+      </div>
 
-      {/* المنتجات (سكرول أفقي) */}
-      <div className="flex items-center gap-5 overflow-x-auto  pb-4 scrollbar-none snap-x snap-mandatory">
+      {/* المنتجات (سكرول أفقي مع شريط سكرول مخصص) */}
+      {/* [&::-webkit-scrollbar]:h-1
+        [&::-webkit-scrollbar-track]:bg-gray-800 
+        [&::-webkit-scrollbar-track]:rounded-full 
+        [&::-webkit-scrollbar-thumb]:bg-white/50
+        [&::-webkit-scrollbar-thumb]:rounded-full 
+        hover:[&::-webkit-scrollbar-thumb]:bg-white/50 */}
+      <div
+        className="flex items-center gap-5 overflow-x-auto pb-4 snap-x snap-mandatory 
+        scrollbar-none"
+      >
         {category?.products?.length > 0 ? (
           category.products.map((p) => (
-            <div key={p.id} className="min-w-[240px] sm:min-w-[280px] shrink-0 snap-start">
+            <div
+              key={p.id}
+              className="min-w-[240px] sm:min-w-[280px] shrink-0 snap-start"
+            >
               <ProductCard
                 title={p.title}
                 price={p.price ? Number(p.price) : 0}

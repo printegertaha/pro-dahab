@@ -8,7 +8,13 @@ export default function AllCategories({ categoriesData }) {
   if (error) {
     console.log(error);
 
-    return <div>err: {JSON.stringify(error)}</div>; // رجّع نص الـ Error عشان تشوفه
+    return (
+      <div>
+        {" "}
+        <p className="text-xl">حدث خطأ </p>
+        <span className="text-xs">{JSON.stringify(error)}</span>
+      </div>
+    ); // رجّع نص الـ Error عشان تشوفه
   }
 
   if (!categories || categories.length < 1) {
