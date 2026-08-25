@@ -3,8 +3,8 @@ import { cacheLife, cacheTag } from "next/cache";
 
 export default async function getCategories_with_someProducts() {
   "use cache";
-  cacheTag("products");
-  cacheLife("max");
+  cacheTag("products", 'categories', 'category-products');
+  cacheLife("hours");
   try {
     const categoriesWith_someProducts = await prisma.category.findMany({
       select: {

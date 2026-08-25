@@ -7,7 +7,7 @@ export default async function Shop_home_page() {
   return (
     <>
       <ShopHero />
-      <AllCategories categoriesData={categories} />
+      <AllCategories categories_props={categories} />
     </>
   );
 }

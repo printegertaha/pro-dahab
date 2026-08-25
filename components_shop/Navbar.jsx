@@ -16,6 +16,9 @@ export default function Navbar_shop() {
           موقع آخر
         </Link>
       </div>
+      <Link href={"/shop/categories"} >
+        التصنيفات
+      </Link>
       <Link href={"/shop/add-product"} className="">
         أضف منتج
       </Link>
