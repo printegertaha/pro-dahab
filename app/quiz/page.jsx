@@ -33,11 +33,27 @@ export default function Home() {
   const [finished, setFinished] = useState(false);
   const [error, setError] = useState("");
 
-  // States الخاصة بالعداد اللحظي وشريط اللودينج اللوب
-  const [extraSeconds, setExtraSeconds] = useState(0);
-  const [keyTrigger, setKeyTrigger] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [extraLoops, setExtraLoops] = useState(0);
 
   const abortControllerRef = useRef(null);
+
+  const getExpectedDuration = (count) => {
+    switch (count) {
+      case 5:
+        return 12;
+      case 10:
+        return 25;
+      case 15:
+        return 38;
+      case 20:
+        return 50;
+      default:
+        return count * 2.5;
+    }
+  };
+
+  const totalDuration = getExpectedDuration(questionCount);
 
   useEffect(() => {
     let interval;
@@ -51,33 +67,26 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [loading]);
 
-  // تأثير العداد الزمني وريست اللوب لما الشريط يخلص
   useEffect(() => {
     let timer;
-    let extraTimer;
-
     if (loading) {
-      setExtraSeconds(0);
+      setElapsedTime(0);
+      setExtraLoops(0);
 
-      // كل 12 ثانية الشريط بيخلص، نقوم نعيد تفاعله (Loop)
-      const loopInterval = setInterval(() => {
-        setKeyTrigger((prev) => prev + 1);
-        setExtraSeconds(0);
-      }, 12000);
-
-      // عداد الثواني الزيادة اللي بيعدي بعد الصفر (+1, +2...)
-      extraTimer = setInterval(() => {
-        setExtraSeconds((prev) => prev + 1);
+      timer = setInterval(() => {
+        setElapsedTime((prev) => {
+          if (prev + 1 >= totalDuration) {
+            setExtraLoops((loops) => loops + 1);
+            return 0;
+          }
+          return prev + 1;
+        });
       }, 1000);
-
-      return () => {
-        clearInterval(loopInterval);
-        clearInterval(extraTimer);
-      };
     } else {
-      setExtraSeconds(0);
+      clearInterval(timer);
     }
-  }, [loading]);
+    return () => clearInterval(timer);
+  }, [loading, totalDuration]);
 
   async function generateQuiz() {
     if (!topic.trim()) {
@@ -128,6 +137,7 @@ export default function Home() {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
+    setLoading(false);
   }
 
   function resetToSettings() {
@@ -184,10 +194,14 @@ export default function Home() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   }
 
+  const progressPercent = Math.max(
+    0,
+    ((totalDuration - elapsedTime) / totalDuration) * 100,
+  );
+
   return (
     <main className="min-h-screen bg-slate-950 px-5 py-10 text-slate-50 font-sans selection:bg-violet-500/30">
       <div className="mx-auto max-w-4xl">
-        {/* Header الرئيسي */}
         <header
           className="text-center mb-10"
           onClick={() => (window.location.href = "/quiz")}
@@ -196,7 +210,7 @@ export default function Home() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600 shadow-lg shadow-violet-600/20"
+            className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600 shadow-lg shadow-violet-600/25 cursor-pointer"
           >
             <Sparkles className="h-8 w-8 text-white" />
           </motion.div>
@@ -213,7 +227,6 @@ export default function Home() {
           </p>
         </header>
 
-        {/* AnimatePresence عشان الانتقال بين شكل الإدخال وشكل الأسئلة يكون ناعم جداً */}
         <AnimatePresence mode="wait">
           {questions.length === 0 ? (
             <motion.section
@@ -231,7 +244,7 @@ export default function Home() {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 disabled={loading}
-                placeholder="مثال: إخترني في البرمجه..."
+                placeholder="مثال: إختبرني في أساسيات البرمجة..."
                 rows={3}
                 className="w-full resize-none rounded-2xl border border-slate-800 bg-slate-950/50 p-4 outline-none transition-all focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 disabled:opacity-50"
               />
@@ -296,7 +309,6 @@ export default function Home() {
                 )}
               </AnimatePresence>
 
-              {/* شريط اللودينج المتحرك بـ Loop وعداد التزايد بعد الصفر فوق الأزرار */}
               <AnimatePresence>
                 {loading && (
                   <motion.div
@@ -306,27 +318,30 @@ export default function Home() {
                     className="mt-6 overflow-hidden"
                   >
                     <div className="flex justify-between items-center mb-1.5 text-xs font-medium text-violet-300/80">
-                      <span>جاري المعالجة العميقـة...</span>
-                      <span className="font-mono text-fuchsia-400">
-                        {extraSeconds === 0
-                          ? "0 ثانية تقريباً"
-                          : `0 ثانية (+${extraSeconds})`}
+                      <span>جاري معالجة الطلب بالذكاء الاصطناعي...</span>
+                      <span className="flex items-center gap-1 font-mono">
+                        {Math.max(0, totalDuration - elapsedTime)} ثانية تقريباً
+                        {extraLoops > 0 && (
+                          <motion.span
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="text-fuchsia-400 font-bold ml-1"
+                          >
+                            +{extraLoops}
+                          </motion.span>
+                        )}
                       </span>
                     </div>
                     <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden p-0.5 border border-violet-500/20 shadow-inner">
-                      <motion.div
-                        key={keyTrigger}
-                        initial={{ width: "100%" }}
-                        animate={{ width: "0%" }}
-                        transition={{ duration: 12, ease: "linear" }}
-                        className="h-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 rounded-full shadow-lg shadow-violet-500/50"
+                      <div
+                        style={{ width: `${progressPercent}%` }}
+                        className="h-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 rounded-full shadow-lg shadow-violet-500/50 transition-all duration-1000 ease-linear"
                       />
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* أزرار التوليد والتحميل اللذيذ */}
               <div className="mt-7 flex gap-3">
                 <button
                   onClick={generateQuiz}
@@ -370,7 +385,6 @@ export default function Home() {
                 )}
               </div>
 
-              {/* لو الـ Loading شغال، بنعرض Skeleton لذيذ يلهي المستخدم ويحسسه إن الشغل شغّال */}
               {loading && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
@@ -399,7 +413,6 @@ export default function Home() {
               )}
             </motion.section>
           ) : (
-            /* شاشة الأسئلة بعد ما تجهز (شاشة الإدخال اختفت) */
             <motion.section
               key="quiz-section"
               initial={{ opacity: 0, y: 20 }}
@@ -408,7 +421,6 @@ export default function Home() {
               transition={{ duration: 0.3 }}
               className="mt-4"
             >
-              {/* شريط معلومات فوق بيوضح الموضوع المختار وزرار تغيير الموضوع */}
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-800/60 bg-slate-900/40 p-4 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-600/20 text-violet-400 font-bold border border-violet-500/30">
@@ -417,7 +429,7 @@ export default function Home() {
                   <div>
                     <p className="text-xs text-slate-400">الموضوع الحالي:</p>
                     <p className="font-bold text-slate-200 capitalize">
-                      {topic}
+                      {topic?.slice(0, 100)}
                     </p>
                   </div>
                 </div>
@@ -431,7 +443,6 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* قوائم الأسئلة */}
               <div className="space-y-6">
                 {questions.map((question, questionIndex) => (
                   <motion.article
@@ -587,7 +598,23 @@ export default function Home() {
           )}
         </AnimatePresence>
       </div>
-   
+      {/* --- الفوتر الاحترافي العظمة --- */}
+
+          {/* تطوير وبرمجة */}
+          <div className="flex items-center justify-center gap-2 text-sm text-slate-400 bg-slate-950/60 px-4 py-2 rounded-2xl border border-slate-800/80 shadow-inner">
+            <span>بمساعدة</span>
+            <a
+              href="https://instagram.com/t2tae"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1 group"
+            >
+              <span>ChatGPT - Gemini</span>
+              <span className="inline-block transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                ↗
+              </span>
+            </a>
+          </div>
     </main>
   );
 }
