@@ -18,8 +18,8 @@ export default async function CategoryProductsContent({params, searchParams}) {
     console.log(error);
     return (
       <div className="flex items-center justify-center h-dvh ">
-        <span className="text-red-800 text-4xl">حصل خطأ </span>
-        <Link href="/" className="text-blue-600 cursor-pointer">
+        <span className="text-red-800 text-4xl">فيه مشكله في نت حضرتك أو في سيرفر حضرتي </span>
+        <Link href="/shop" className="text-blue-600 cursor-pointer">
           الصفحة الرئيسية
         </Link>
       </div>

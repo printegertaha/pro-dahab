@@ -4,6 +4,8 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "dhb.4tvshop.com" },
       { protocol: "https", hostname: "i.pinimg.com" },
+      { protocol: "https", hostname: "pin.it" },
+
       {
         protocol: "https",
         hostname: "imgs.search.brave.com",

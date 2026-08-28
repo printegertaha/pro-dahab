@@ -5,6 +5,7 @@ import CategoryRow from "./CategoryRow";
 import generateDataHash from "@/lib/generateDataHash";
 
 export default function AllCategories({ categories_props }) {
+  console.log(categories_props)
   const { data: categories_server, error } = categories_props; // دي الداتا سواء من السيرفر الكاش او من الداتابيز
   const [categories, setCategories] = useState(() => {
     if (typeof window === "undefined") return categories_server;
@@ -61,20 +62,33 @@ export default function AllCategories({ categories_props }) {
     }
   }, []);
 
-  if (error) {
+  if (error && !categories) {
     console.log(error);
 
     return (
-      <div>
+      <div className="border border-red-500  bg-red-900 h-50 w-[80vw] mx-auto rounded-2xl m-5 flex items-center justify-center flex-col gap-10">
         {" "}
-        <p className="text-xl">حدث خطأ </p>
+        <p className="text-2xl font-black">حدث خطأ في السيرفر!</p>
         <span className="text-xs">{JSON.stringify(error)}</span>
       </div>
     );
   }
 
-  if (!categories || categories.length < 1 || !Array.isArray(categories)) {
-    return <div>مفيش تصنيفات تتعرض</div>;
+  if (categories.length < 1) {
+    console.log(categories)
+    return (
+      <div className="border-2 h-70 rounded-xl p-5  flex flex-col justify-between text-2xl  border-red-500  bg-red-900 font-mono text-yellow-500 w-[80vw] sm:w-[60vw] mx-auto font-black">
+        <p className="">مفيش منتجات حالياََ</p>
+        <p className="mx-auto ">فيه مشكلة في نت حضرتك أو في سيرفر حضرتي</p>
+        <button
+          type="button"
+          className="text-xl  p-2 rounded-2xl cursor-pointer mr-auto "
+          onClick={() => (window.location.href = "/shop")}
+        >
+          إعادة المحاولة
+        </button>
+      </div>
+    );
   }
 
   return (

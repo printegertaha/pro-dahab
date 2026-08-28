@@ -5,6 +5,7 @@ import { Suspense } from "react";
 export default function CategoryProducts({ params, searchParams }) {
   return (
     <>
+      <h3>صفحة مننتجات تصنيف دي خد بالك</h3>
       <Suspense
         fallback={
           <div className="flex flex-wrap gap-2">
