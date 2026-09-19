@@ -1,150 +1,131 @@
 "use client";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useState } from "react";
 
-export default function PaginationBar({ currentPage, totalPages }) {
-  const router = useRouter();
+import { productsPerPage } from "@/lib/constants";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+
+export default function PaginationBar({ productsCount, currentPage = 1 }) {
+  const current = Number(currentPage) || 1;
+  const pagesCount = Math.ceil(productsCount / productsPerPage);
+
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  
-  // State لتخزين الرقم اللي المستخدم بيكتبه في خانة البحث السريع
-  const [goPage, setGoPage] = useState("");
 
-  // لو إجمالي الصفحات صفحة واحدة مش محتاجين نعرض البار
-  if (totalPages <= 1) return null;
-
-  // دالة لتغيير الـ page في الـ URL مع الحفاظ على أي فلاتر تانية
-  const createPageURL = (pageNumber) => {
+  // دالة عمل رابط لصفحة معينة
+  function createPageLink(pageNum) {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("page", pageNumber.toString());
+    params.set("page", pageNum.toString());
     return `${pathname}?${params.toString()}`;
-  };
+  }
 
-  const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages) return;
-    router.push(createPageURL(page));
-  };                                                                              
+  if (!pagesCount || pagesCount <= 1) return null;
 
-  // دالة البحث السريع برقم الصفحة
-  const handleGoToPageSubmit = (e) => {
-    e.preventDefault(); // منع الصفحة من الـ Reload
-    const targetPage = Number(goPage);
+  // حساب الصفحات المطلوب عرضها (الأولى، الأخيرة، الحالية، 2 قبلها، 2 بعدها)
+  const pageSet = new Set();
+  pageSet.add(1);
+  pageSet.add(pagesCount);
 
-    // التأكد إن الرقم المدخل صالح وموجود ضمن نطاق الصفحات
-    if (targetPage >= 1 && targetPage <= totalPages) {
-      handlePageChange(targetPage);
-      setGoPage(""); // تصفير الـ input بعد البحث
-    } else {
-      alert(`برجاء إدخال رقم صفحة صحيح بين 1 و ${totalPages}`);
+  for (let i = current - 2; i <= current + 2; i++) {
+    if (i >= 1 && i <= pagesCount) {
+      pageSet.add(i);
     }
-  };
+  }
 
-  // 🧠 دالة المنطق الذكي لتوليد أرقام الصفحات والنقط
-  const getVisiblePages = () => {
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const sortedPages = Array.from(pageSet).sort((a, b) => a - b);
+
+  const paginationItems = [];
+  for (let i = 0; i < sortedPages.length; i++) {
+    const pageNum = sortedPages[i];
+    if (i > 0) {
+      const prevPage = sortedPages[i - 1];
+      if (pageNum - prevPage > 1) {
+        paginationItems.push({
+          type: "ellipsis",
+          key: `ellipsis-${prevPage}-${pageNum}`,
+        });
+      }
     }
-
-    const pages = [];
-
-    if (currentPage <= 4) {
-      pages.push(1, 2, 3, 4, 5, "...", totalPages);
-    } 
-    else if (currentPage >= totalPages - 3) {
-      pages.push(1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-    } 
-    else {
-      pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
-    }
-
-    return pages;
-  };
-
-  const visiblePages = getVisiblePages();
+    paginationItems.push({
+      type: "page",
+      page: pageNum,
+      key: `page-${pageNum}`,
+    });
+  }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 my-6 select-none">
-      
-      {/* البار الرئيسي للأرقام */}
-      <ul className="flex items-center gap-1 bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-100">
-        {/* زرار الصفحة السابقة */}
-        <li
-          onClick={() => handlePageChange(currentPage - 1)}
-          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-            currentPage === 1
-              ? "text-gray-300 cursor-not-allowed"
-              : "text-gray-700 hover:bg-gray-100 cursor-pointer"
-          }`}
+    <div
+      className="flex items-center justify-center gap-1.5 sm:gap-2 py-8 flex-wrap select-none"
+      dir="rtl"
+    >
+      {/* زر السابق */}
+      {current > 1 ? (
+        <Link
+          prefetch={false}
+          href={createPageLink(current - 1)}
+          className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-all duration-200 text-sm font-medium shadow-sm active:scale-95"
         >
-          السابق
-        </li>
+          <ChevronRight className="w-4 h-4" />
+          <span>السابق</span>
+        </Link>
+      ) : (
+        <span className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-zinc-900/60 text-zinc-600 cursor-not-allowed text-sm font-medium border border-zinc-800/40">
+          <ChevronRight className="w-4 h-4" />
+          <span>السابق</span>
+        </span>
+      )}
 
-        {/* عرض أرقام الصفحات والنقط ديناميكياً */}
-        {visiblePages.map((page, idx) => {
-          if (page === "...") {
+      {/* أرقام الصفحات */}
+      <ul className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-center">
+        {paginationItems.map((item) => {
+          if (item.type === "ellipsis") {
             return (
               <li
-                key={`ellipsis-${idx}`}
-                className="px-2 py-1.5 text-gray-400 text-sm font-semibold cursor-default"
+                key={item.key}
+                className="w-8 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-zinc-500 font-bold tracking-widest text-sm select-none"
               >
                 ...
               </li>
             );
           }
 
+          const pageNum = item.page;
+          const isActive = pageNum === current;
+
           return (
-            <li
-              key={`page-${page}`}
-              onClick={() => handlePageChange(Number(page))}
-              className={`px-3.5 py-1.5 rounded-md text-sm font-semibold transition-all cursor-pointer ${
-                currentPage === page
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-100"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              {page}
+            <li key={item.key}>
+              <Link
+                prefetch={false}
+                href={createPageLink(pageNum)}
+                className={`min-w-9 h-9 sm:min-w-10 sm:h-10 px-2.5 sm:px-3 rounded-xl text-sm font-semibold flex items-center justify-center transition-all duration-200 ${
+                  isActive
+                    ? "bg-amber-500 text-zinc-950 shadow-md shadow-amber-500/20 scale-105"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                }`}
+              >
+                {pageNum}
+              </Link>
             </li>
           );
         })}
-
-        {/* زرار الصفحة التالية */}
-        <li
-          onClick={() => handlePageChange(currentPage + 1)}
-          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-            currentPage === totalPages
-              ? "text-gray-300 cursor-not-allowed"
-              : "text-gray-700 hover:bg-gray-100 cursor-pointer"
-          }`}
-        >
-          التالي
-        </li>
       </ul>
 
-      {/* 🚀 فورم الانتقال السريع برقم الصفحة */}
-      <form 
-        onSubmit={handleGoToPageSubmit}
-        className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100"
-      >
-        <label htmlFor="jump-to-page" className="text-xs text-gray-500 font-medium">
-          ذهاب إلى:
-        </label>
-        <input
-          id="jump-to-page"
-          type="number"
-          min="1"
-          max={totalPages}
-          value={goPage}
-          onChange={(e) => setGoPage(e.target.value)}
-          className="w-14 text-center border border-gray-200 rounded p-1 text-sm text-black outline-none focus:border-blue-500 transition-all font-semibold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-        />
-        <button
-          type="submit"
-          className="bg-gray-800 text-white text-xs font-semibold px-3 py-1.5 rounded hover:bg-blue-600 transition-all shadow-sm"
+      {/* زر التالي */}
+      {current < pagesCount ? (
+        <Link
+          prefetch={false}
+          href={createPageLink(current + 1)}
+          className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-all duration-200 text-sm font-medium shadow-sm active:scale-95"
         >
-          انتقال
-        </button>
-      </form>
-
+          <span>التالي</span>
+          <ChevronLeft className="w-4 h-4" />
+        </Link>
+      ) : (
+        <span className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-zinc-900/60 text-zinc-600 cursor-not-allowed text-sm font-medium border border-zinc-800/40">
+          <span>التالي</span>
+          <ChevronLeft className="w-4 h-4" />
+        </span>
+      )}
     </div>
   );
 }

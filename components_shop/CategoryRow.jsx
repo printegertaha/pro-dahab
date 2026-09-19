@@ -7,11 +7,11 @@ export default function CategoryRow({ category }) {
       {/* رأس القسم: اسم التصنيف وزر مشاهدة الكل */}
       <div className="flex items-center justify-between pb-3 mb-6 border-b border-zinc-800">
         <h2 className="text-xl md:text-2xl font-bold text-zinc-100 tracking-wide">
-          {category.nickName}
+          {category?.nickName || "التصينف"}
         </h2>
 
         <Link
-          href={`/shop/categories/${category.name}`}
+          href={`/categories/${category.name}`}
           className="text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1 group"
         >
           <span>مشاهدة الكل</span>
@@ -29,15 +29,12 @@ export default function CategoryRow({ category }) {
         [&::-webkit-scrollbar-thumb]:rounded-full 
         hover:[&::-webkit-scrollbar-thumb]:bg-white/50 */}
       <div
-        className="flex items-center gap-5 overflow-x-auto pb-4 snap-x snap-mandatory 
+        className="flex items-stretch gap-5 overflow-x-auto pb-4 snap-x snap-mandatory 
         scrollbar-none"
       >
         {category?.products?.length > 0 ? (
           category.products.map((p) => (
-            <div
-              key={p.id}
-              className="min-w-[240px] sm:min-w-[280px] shrink-0 snap-start"
-            >
+            <div key={p.id} className="shrink-0 snap-start flex">
               <ProductCard
                 title={p.title}
                 price={p.price ? Number(p.price) : 0}

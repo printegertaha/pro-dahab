@@ -1,6 +1,7 @@
 import getCategories from "@/actions_shop/getCategories";
 import CategoriesCacheHandler from "@/components_shop/CategoriesCacheHandler";
 import CategoriesContent from "@/components_shop/CategoriesContent";
+import SkeletonCategoryCard from "@/skeltons/SkeletonCategoryCard";
 import { Suspense } from "react";
 
 // دالة اختيار الأيقونة بناءً على التصنيفات الفعلية
@@ -17,11 +18,15 @@ export default async function Shop_categories_page() {
 
         <Suspense
           fallback={
-            <div className="text-red-600 text-5xl">جار تحميل التصنيفات</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {Array.from({ length: 9 }).map((_, idx) => (
+                <SkeletonCategoryCard key={idx} />
+              ))}
+            </div>
           }
         >
           <CategoriesContent categoriesProps={categories} />
-          <CategoriesCacheHandler categories_server={categories}/>
+          <CategoriesCacheHandler categories_server={categories} />
         </Suspense>
       </div>
     </main>

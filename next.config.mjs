@@ -12,6 +12,11 @@ const nextConfig = {
         pathname: "/**", // يسمح بأي مسار صور تحت الدومين ده
       },
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/**",
+      },
     ],
   },
   cacheComponents: true,

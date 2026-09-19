@@ -1,21 +1,18 @@
 export default function SkeletonProductCard() {
   return (
-    <div className="w-72 h-72 mx-auto bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 font-sans">
-      {/* منطقة الصورة والعلامات المائية والشعار */}
-      <div className="relative w-full h-48 bg-gray-50 flex items-center justify-center p-4">
-        {/* العلامات المائية النصية */}
-        <div className="absolute inset-0 flex flex-col bg-gray-500 animate-pulse items-center justify-center pointer-events-none space-y-2"></div>
-      </div>
+    <div className="bg-white shrink-0 rounded-2xl shadow-md overflow-hidden border border-gray-100 w-72 max-[425px]:w-[68vw] animate-pulse">
+      {/* الصورة المصغرة */}
+      <div className="relative w-full h-48 max-[425px]:h-[42vw] bg-gray-200" />
 
-      {/* منطقة معلومات المنتج (العنوان والسعر) */}
-      <div className="p-4 bg-white flex flex-col space-y-3" dir="rtl">
-        {/* عنوان المنتج */}
-        <div className="w-full h-6 bg-gray-300 rounded-xl animate-pulse"></div>
+      {/* تفاصيل المنتج */}
+      <div className="p-4 max-[425px]:p-3 space-y-3 max-[425px]:space-y-1.5">
+        {/* العنوان */}
+        <div className="h-5 max-[425px]:h-4 w-3/4 bg-gray-200 rounded-md" />
 
         {/* السعر */}
-        <div className="flex items-center justify-start gap-2">
-          <span className="block bg-gray-300 w-20 h-6 animate-pulse rounded-xl "></span>
-          <span className="block w-10 h-6 rounded-xl bg-gray-300 animate-pulse"></span>
+        <div className="flex items-center gap-1">
+          <div className="h-6 max-[425px]:h-5 w-16 bg-gray-200 rounded-md" />
+          <div className="h-6 max-[425px]:h-5 w-7 bg-gray-200 rounded-md" />
         </div>
       </div>
     </div>

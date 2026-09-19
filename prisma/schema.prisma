@@ -38,13 +38,14 @@ model Product {
   ProductImage   ProductImage[]
   Review         Review[]
 
-  @@index([title])
+  @@index([title]) 
   @@index([price])
   @@index([createdAt(sort: Desc)])
+  @@index([categoryId, createdAt, id]) // not added
 }
 
 model Category {
-  id       String    @id @default(uuid())
+  id       String    @id @default(uuid()) 
   name     String    @unique
   nickName String    @unique
   products Product[]

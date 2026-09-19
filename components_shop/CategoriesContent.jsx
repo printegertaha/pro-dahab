@@ -195,7 +195,7 @@ export default function CategoriesContent({ categoriesProps }) {
             return (
               <Link
                 key={cat.id || cat.name}
-                href={`/shop/categories/${cat.name}`}
+                href={`/categories/${cat.name}`}
                 className="group relative flex items-center justify-between overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-5 sm:p-6 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/40 hover:bg-zinc-900/90 hover:shadow-[0_0_25px_rgba(245,158,11,0.12)] active:scale-98"
               >
                 {/* الأيقونة والاسم */}

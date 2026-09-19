@@ -35,13 +35,13 @@ export default function ShopHero() {
             {/* الأزرار */}
             <div className="flex flex-row items-center justify-center lg:justify-start gap-4 pt-2">
               <Link
-                href="/shop/categories"
+                href="/categories"
                 className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-zinc-400 hover:bg-amber-300 text-zinc-950 font-bold transition-all duration-200 shadow-lg shadow-amber-500/10 text-center active:scale-95"
               >
                 تصفح الاقسام
               </Link>
               <Link
-                href="/shop/categories/all_products"
+                href="/categories/all_products"
                 className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold transition-all duration-200 shadow-lg shadow-amber-500/10 text-center active:scale-95"
               >
                 تصفح المنتجات

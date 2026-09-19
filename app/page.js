@@ -1,9 +1,13 @@
-import HeroSection_global from "@/components_global/HeroSection_global"
-export default async function Home() {
+import getCategories_with_someProducts from "@/actions_shop/getCategories_with_someProducts";
+import AllCategories from "@/components_shop/AllCategories";
+import ShopHero from "@/components_shop/HeroSection";
+
+export default async function Shop_home_page() {
+  const categories = await getCategories_with_someProducts();
   return (
     <>
-    <HeroSection_global />
-
+      <ShopHero />
+      <AllCategories categories_props={categories} />
     </>
   );
 }

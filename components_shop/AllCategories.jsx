@@ -1,34 +1,35 @@
 "use client";
-import SkeletonProductCard from "@/skeltons/SkeltonProductCard";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CategoryRow from "./CategoryRow";
 import generateDataHash from "@/lib/generateDataHash";
 
 export default function AllCategories({ categories_props }) {
-  console.log(categories_props)
   const { data: categories_server, error } = categories_props; // دي الداتا سواء من السيرفر الكاش او من الداتابيز
-  const [categories, setCategories] = useState(() => {
-    if (typeof window === "undefined") return categories_server;
+
+  // الـ state بس عشان الـ initial render — لو فيه كاش في المتصفح نعرضه فوراً
+  const [cachedCategories] = useState(() => {
+    if (typeof window === "undefined") return null;
 
     try {
       const cached = localStorage.getItem("categories_with_some_products");
       if (cached) {
         const parsed = JSON.parse(cached);
-        // لو الكاش فيه داتا وسليمة نعرضها فوراً
         if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed;
         }
       }
     } catch (e) {
-      // لو حصل أي خطأ في القراءة ارجع لداتا السيرفر فوراً
-      console.log("categories isn't a valid JSON! 😂😂❌");
       console.log(e);
     }
-    return categories_server;
+    return null;
   });
 
+  // السيرفر دايماً هو المصدر الأساسي — الكاش بس fallback
+  const categories =
+    !error && categories_server ? categories_server : cachedCategories;
+
+  // الـ effect بس بيعمل sync للـ localStorage — مفيش setState
   useEffect(() => {
-    // لو فيه مشكله في الداتا اللي راجعه من السيرفر
     if (!categories_server || error) return;
 
     const categories_localS_str = localStorage.getItem(
@@ -40,31 +41,18 @@ export default function AllCategories({ categories_props }) {
     const serverHash = generateDataHash(categories_server_str);
 
     try {
-      if (categories_localS_str) {
-        // لو تصنيفات المتصفح مش نفس تصنيفات السيرفر
-        if (clientHash !== serverHash) {
-          setCategories(categories_server);
-          localStorage.setItem(
-            "categories_with_some_products",
-            categories_server_str,
-          );
-          console.log("إطمن مسحنا العك وضيفنا الصح✅");
-        }
-      } else {
+      if (!categories_localS_str || clientHash !== serverHash) {
         localStorage.setItem(
           "categories_with_some_products",
           categories_server_str,
         );
-        console.log("cats added to localStorage✅");
       }
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [categories_server, error]);
 
   if (error && !categories) {
-    console.log(error);
-
     return (
       <div className="border border-red-500  bg-red-900 h-50 w-[80vw] mx-auto rounded-2xl m-5 flex items-center justify-center flex-col gap-10">
         {" "}
@@ -74,8 +62,7 @@ export default function AllCategories({ categories_props }) {
     );
   }
 
-  if (categories.length < 1) {
-    console.log(categories)
+  if (!categories || categories.length < 1) {
     return (
       <div className="border-2 h-70 rounded-xl p-5  flex flex-col justify-between text-2xl  border-red-500  bg-red-900 font-mono text-yellow-500 w-[80vw] sm:w-[60vw] mx-auto font-black">
         <p className="">مفيش منتجات حالياََ</p>
@@ -83,7 +70,7 @@ export default function AllCategories({ categories_props }) {
         <button
           type="button"
           className="text-xl  p-2 rounded-2xl cursor-pointer mr-auto "
-          onClick={() => (window.location.href = "/shop")}
+          onClick={() => (window.location.href = "/")}
         >
           إعادة المحاولة
         </button>
@@ -94,18 +81,7 @@ export default function AllCategories({ categories_props }) {
   return (
     <div className=" p-5 rounded-2xl w-full">
       {categories.map((c) => (
-        <Suspense
-          key={c.id}
-          fallback={
-            <div className="flex items-center flex-wrap gap-4">
-              {Array.from({ length: 4 }).map((_, idx) => (
-                <SkeletonProductCard key={idx} />
-              ))}
-            </div>
-          }
-        >
-          <CategoryRow category={c} />
-        </Suspense>
+        <CategoryRow key={c.id} category={c} />
       ))}
     </div>
   );
